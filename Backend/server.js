@@ -15,6 +15,7 @@ const xss = require('xss-clean');
 
 // start route files 
 const auth = require('./routes/auth')
+const nasa = require('./routes/Nasa')
 //end route files 
 
 //load env
@@ -60,6 +61,7 @@ app.use(cors());
 
 // start mount routes 
 app.use('/api/v1/auth',auth)
+app.use('/api/v1/nasa',nasa)
 // end mount routes 
 
 app.use(errorHandler)
