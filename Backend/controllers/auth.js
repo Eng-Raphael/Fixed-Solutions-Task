@@ -31,12 +31,12 @@ exports.login = asyncHandler(async (req, res, next) => {
 
     const { username, password } = req.body;
 
-    // Validate emil & password
+    // Validate username & password
     if (!username || !password) {
         return next(new ErrorResponse('Please provide an username and password', 400));
     }
     // Check for user
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ username }).select('+password');
 
     if (!user) {
         return next(new ErrorResponse('Invalid credentials', 401));
@@ -119,22 +119,22 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
     if (req.body.lastName) fieldsToUpdate.lastName = req.body.lastName;
     if (req.body.email) fieldsToUpdate.email = req.body.email;
     if (req.body.username) fieldsToUpdate.username = req.body.username;
-    if (req.body.password) fieldsToUpdate.password = req.body.password;
 
     const user = await User.findByIdAndUpdate(req.user.id , fieldsToUpdate , {
         new : true,
         runValidators : true
     })
 
-    // Check current password
-    if (!(await user.matchPassword(req.body.currentPassword))) {
-        return next(new ErrorResponse('Password is incorrect', 401));
-    }
+    if (req.body.oldPassword && req.body.newPassword){
+        // Check current password
+        if (!(await user.matchPassword(req.body.oldPassword))) {
+            return next(new ErrorResponse('oldPassword Does not match', 401));
+        }
 
-    if (req.body.newPassword) {
         user.password = req.body.newPassword;
         await user.save();
     }
+
 
     res.status(200).json({
         success: true,
