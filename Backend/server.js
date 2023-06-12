@@ -14,7 +14,7 @@ const cors = require('cors');
 const xss = require('xss-clean');
 
 // start route files 
-
+const auth = require('./routes/auth')
 //end route files 
 
 //load env
@@ -59,7 +59,7 @@ app.use(hpp());
 app.use(cors());
 
 // start mount routes 
-
+app.use('/api/v1/auth',auth)
 // end mount routes 
 
 app.use(errorHandler)
