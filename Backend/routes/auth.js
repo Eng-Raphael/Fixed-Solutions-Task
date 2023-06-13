@@ -9,14 +9,16 @@ const {
 
 } = require('../controllers/auth');
 
+const { registerRules, loginRules, updateDetailsRules } = require('../middleware/authMiddleware');
+
 const router = express.Router();
 
 const { protect } = require('../middleware/auth');
 
-router.post('/register', register);
-router.post('/login', login);
+router.post('/register', registerRules()  ,register);
+router.post('/login',loginRules() ,login);
 router.get('/logout', logout);
 router.get('/me', protect, getMe);
-router.put('/updatedetails', protect, updateDetails);
+router.put('/updatedetails', protect, updateDetailsRules(),updateDetails);
 
 module.exports = router;

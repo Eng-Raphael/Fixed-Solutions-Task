@@ -1,3 +1,4 @@
+const { body, validationResult } = require('express-validator');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const User = require('../models/User');
@@ -8,6 +9,11 @@ const crypto = require('crypto');
 // @access    Public
 
 exports.register = asyncHandler(async (req, res, next) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array()[0].msg, 400));
+    }
 
     const { firstName,lastName,email,password,username } = req.body;
 
@@ -28,6 +34,11 @@ exports.register = asyncHandler(async (req, res, next) => {
 // @route     POST /api/v1/auth/login
 // @access    Public
 exports.login = asyncHandler(async (req, res, next) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(new ErrorResponse(errors.array()[0].msg, 400));
+    }
 
     const { username, password } = req.body;
 
@@ -113,6 +124,11 @@ exports.getMe = asyncHandler(async (req, res, next) => {
 // @route     PUT /api/v1/auth/updatedetails
 // @access    Private
 exports.updateDetails = asyncHandler(async (req, res, next) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return next(new ErrorResponse(errors.array()[0].msg, 400));
+    }
 
     const fieldsToUpdate = {};
     if (req.body.firstName) fieldsToUpdate.firstName = req.body.firstName;
