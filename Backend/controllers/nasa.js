@@ -1,7 +1,7 @@
 const asyncHandler = require('../middleware/async');
 const User = require('../models/User');
 const Asset = require('../models/Asset');
-
+const ErrorResponse = require('../utils/errorResponse');
 
 // Create an in-memory cache
 const cache = {};
@@ -63,6 +63,12 @@ exports.addToFavorite = asyncHandler(async (req, res, next) => {
      url ,
      media_type
   } = req.body;
+
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return next(new ErrorResponse(errors.array()[0].msg, 400));
+  }
 
   const user = await User.findById(req.params.userId);
 

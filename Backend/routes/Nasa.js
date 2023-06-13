@@ -3,6 +3,7 @@ const router = express.Router();
 const advancedResults = require('../middleware/advancedResults');
 
 const { search , addToFavorite , removeFromFavorite , searchAssets} = require('../controllers/nasa');
+const { addToFavoriteValidationRules } = require('../middleware/nasaMiddleware');
 const{ protect } = require('../middleware/auth');
 
 router
@@ -11,7 +12,7 @@ router
 
 router // /api/users/:userId/favorites
 .route('/addToFavorite/user/:userId/nasa/:nasaId')
-.post(protect, addToFavorite);
+.post(protect,addToFavoriteValidationRules() ,addToFavorite);
 
 router //api/users/:userId/nasa/:nasaId
 .route('/removeFromFavorite/user/:userId/nasa/:nasaId')
