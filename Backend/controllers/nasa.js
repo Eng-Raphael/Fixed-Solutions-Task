@@ -1,4 +1,3 @@
-const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const User = require('../models/User');
 const Asset = require('../models/Asset');
@@ -177,3 +176,88 @@ exports.searchAssets = asyncHandler(async (req, res, next) => {
     data: assets,
   });
 });
+
+
+
+/**
+ * 
+ * I have problem in redis server 
+ * so i used direct in RAM cashe 
+ * but i can do cashing using redis 
+ * and the code is below here
+ */
+
+
+// const redis = require('redis');
+// const client = redis.createClient({
+//   host: '127.0.0.1',
+//   port: 6379,
+//   db: 0, // select the first database (default is 0)
+// });
+// client.connect().catch(err => { console.log(err); });
+// // @desc    Search for images or videos using keywords
+// // @route   GET /api/nasa/search?q={q}
+// // @access  Public
+// exports.search = asyncHandler(async (req, res, next) => {
+//   let { q, page, limit } = req.query;
+  
+//   // Check if q is empty or consists only of whitespace
+//   q = q.trim();
+//   if (!q) {
+//       return res.status(400).json({
+//           success: false,
+//           message: 'Search query cannot be empty or consist only of whitespace',
+//       });
+//   }
+
+//   // Set default values for page and limit if they are not present in req.query
+//   if (!page) {
+//       page = 1;
+//   }
+//   if (!limit) {
+//       limit = 10;
+//   }
+
+//   const maxLimit = 50; // Maximum limit that a user can request
+//   const url = `https://images-api.nasa.gov/search?q=${q}&page=${page}&limit=${limit}&media_type=image,video`;
+
+//   // Check if limit is greater than maximum limit
+//   const validatedLimit = Math.min(limit, maxLimit);
+//   // Check if data is cached in Redis
+//   const cacheKey = `${q}-${page}-${validatedLimit}`;
+//   client.get(cacheKey, (err, data) => {
+//       if (err) throw err;
+//       if (data !== null) {
+//           console.log('Using cached data from Redis');
+//           const parsedData = JSON.parse(data);
+//           res.status(200).json({
+//               success: true,
+//               count: parsedData.collection.items.length,
+//               data: parsedData.collection.items,
+//           });
+//       } else {
+//           console.log('Fetching data from NASA API');
+//           fetch(url)
+//               .then(response => response.json())
+//               .then(data => {
+//                   // Cache data in Redis for 1 hour
+//                   client.setex(cacheKey, 60 * 60, JSON.stringify(data));
+//                   const startIndex = (page - 1) * validatedLimit;
+//                   const endIndex = page * validatedLimit;
+//                   const results = data.collection.items.slice(startIndex, endIndex);
+//                   res.status(200).json({
+//                       success: true,
+//                       count: results.length,
+//                       data: results,
+//                   });
+//               })
+//               .catch(err => {
+//                   console.error(err);
+//                   res.status(500).json({
+//                       success: false,
+//                       message: 'Internal server error',
+//                   });
+//               });
+//       }
+//   });
+// });
