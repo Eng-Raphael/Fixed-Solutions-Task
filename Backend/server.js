@@ -57,7 +57,17 @@ app.use(limiter);
 app.use(hpp());
 
 // Enable CORS
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT','PATCH', 'DELETE'],
+    allowedHeaders: ['Authorization', 'X-Requested-With', 'Content-Type'],
+    credentials: true
+}));
+
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
+});
 
 // start mount routes 
 app.use('/api/v1/auth',auth)
