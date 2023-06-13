@@ -135,3 +135,45 @@ exports.removeFromFavorite = asyncHandler(async (req, res, next) => {
     message: 'Asset removed from favorites',
   });
 });
+
+
+// @desc    Search for assets by title or description
+// @route   GET /api/assets/search?q={q}
+// @access  Public
+exports.searchAssets = asyncHandler(async (req, res, next) => {
+  const { q, page = 1, limit = 10 } = req.query;
+  const maxLimit = 50; // Maximum limit that a user can request
+  const startIndex = (page - 1) * limit;
+
+  if (!q) {
+    return res.status(400).json({
+      success: false,
+      message: "Search query cannot be empty.",
+    });
+  }
+
+  // Find assets that match the search query
+  const assets = await Asset.find({
+    $or: [
+      { title: { $regex: new RegExp(q, "i") } },
+      { description: { $regex: new RegExp(q, "i") } },
+    ],
+  })
+    .select({ _id: 0, __v: 0 })
+    .skip(startIndex)
+    .limit(limit);
+
+  if (assets.length === 0) {
+    return res.status(404).json({
+      success: false,
+      message: "No assets found.",
+    });
+  }
+
+  // Return the search results
+  res.status(200).json({
+    success: true,
+    count: assets.length,
+    data: assets,
+  });
+});

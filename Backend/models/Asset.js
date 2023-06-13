@@ -28,4 +28,9 @@ const assetSchema = new mongoose.Schema({
     }
 });
 
+assetSchema.index({
+    title: 'text',
+    description: 'text'
+});
+
 module.exports = mongoose.model('Asset', assetSchema);

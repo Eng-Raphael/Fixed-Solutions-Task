@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const advancedResults = require('../middleware/advancedResults');
 
-const { search , addToFavorite , removeFromFavorite} = require('../controllers/nasa');
+const { search , addToFavorite , removeFromFavorite , searchAssets} = require('../controllers/nasa');
 const{ protect } = require('../middleware/auth');
 
 router
@@ -16,5 +16,9 @@ router // /api/users/:userId/favorites
 router //api/users/:userId/nasa/:nasaId
 .route('/removeFromFavorite/user/:userId/nasa/:nasaId')
 .delete(protect, removeFromFavorite);
+
+router
+.route('/searchAssets')
+.get(protect, searchAssets );
 
 module.exports = router;
