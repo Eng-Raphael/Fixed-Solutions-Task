@@ -1,8 +1,7 @@
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-const redis = require('redis');
-const { promisify } = require('util');
-const advancedResults = require('../middleware/advancedResults');
+const User = require('../models/User');
+const Asset = require('../models/Asset');
 
 
 // Create an in-memory cache
@@ -52,3 +51,87 @@ exports.search = asyncHandler(async (req, res, next) => {
 
 });
 
+
+// @desc    Add video to user's favorites
+// @route   POST /api/users/:userId/nasa/:nasaId
+// @access  Private
+exports.addToFavorite = asyncHandler(async (req, res, next) => {
+
+  const {
+     title , 
+     description ,
+     photographer,
+     url ,
+     media_type
+  } = req.body;
+
+  const user = await User.findById(req.params.userId);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: 'User not found',
+    });
+  }
+  
+  const Nasa_id = req.params.nasaId;
+
+  const asset = await Asset.create({
+    title,
+    description,
+    photographer,
+    url,
+    media_type,
+    nasa_id : Nasa_id
+  });
+
+  user.favorites.push(asset._id);
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    data: asset,
+  });
+
+}); 
+
+
+// @desc    Remove video from user's favorites
+// @route   DELETE /api/users/:userId/nasa/:nasaId
+// @access  Private
+exports.removeFromFavorite = asyncHandler(async (req, res, next) => {
+
+  const user = await User.findById(req.params.userId);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: 'User not found',
+    });
+  }
+
+  const asset = await Asset.findOne({ nasa_id: req.params.nasaId });
+
+  if (!asset) {
+    return res.status(404).json({
+      success: false,
+      message: 'Asset not found',
+    });
+  }
+
+  // Remove asset from user's favorites
+  user.favorites.pull(asset._id);
+  await user.save();
+
+  // Check if asset is referenced by any other users
+  const assetUsers = await User.find({ favorites: asset._id });
+  if (assetUsers.length === 0) {
+    // Delete asset from database if not referenced by any other users
+    await Asset.findByIdAndDelete(asset._id);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Asset removed from favorites',
+  });
+});

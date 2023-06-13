@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const vedioSchema = new mongoose.Schema({
+const assetSchema = new mongoose.Schema({
     title: {
         type: String,
         required: [true, 'Please enter title'],
@@ -28,4 +28,4 @@ const vedioSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('Vedio', vedioSchema);
+module.exports = mongoose.model('Asset', assetSchema);

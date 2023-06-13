@@ -37,6 +37,10 @@ const UserSchema = new mongoose.Schema({
     minlength: [8, 'Password must be at least 8 characters'],
     select: false,
   },
+  favorites: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Asset',
+  }],
 }, { timestamps: true });
 
 UserSchema.pre('save', async function (next) {
